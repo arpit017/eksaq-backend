@@ -42,6 +42,22 @@ app.get("/", async(req, res) => {
 //     });
 //   });
 // };
+const downloadFile = (url) => {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    https.get(url, (response) => {
+      response.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      response.on('end', () => {
+        const fileData = Buffer.concat(chunks);
+        resolve(fileData);
+      });
+    }).on('error', (err) => {
+      reject(err.message);
+    });
+  });
+};
 
 
 app.post('/upload', upload.single('audiofile'), async (req, res) => {
