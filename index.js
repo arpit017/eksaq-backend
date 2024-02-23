@@ -1,3 +1,4 @@
+const axios = require('axios');
 const express = require("express");
 const { connection } = require("./connection");
 // const { S3 } = require('aws-sdk');
@@ -23,42 +24,14 @@ const openai= new OpenAI(
 apiKey:process.env.API_KEY
 }
 ) 
-let audiofornow=""
+
 app.get("/", async(req, res) => {
  const data=await AudioModel.find();
  res.send({data})
 });
 
-// const downloadFile = (url, dest) => {
-//   return new Promise((resolve, reject) => {
-//     const file = fs.createWriteStream(dest);
-//     https.get(url, (response) => {
-//       response.pipe(file);
-//       file.on('finish', () => {
-//         file.close(resolve(dest));
-//       });
-//     }).on('error', (err) => {
-//       fs.unlink(dest);
-//       reject(err.message);
-//     });
-//   });
-// };
-const downloadFile = (url) => {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    https.get(url, (response) => {
-      response.on('data', (chunk) => {
-        chunks.push(chunk);
-      });
-      response.on('end', () => {
-        const fileData = Buffer.concat(chunks);
-        resolve(fileData);
-      });
-    }).on('error', (err) => {
-      reject(err.message);
-    });
-  });
-};
+
+
 
 
 app.post('/upload', upload.single('audiofile'), async (req, res) => {
@@ -71,35 +44,20 @@ app.post('/upload', upload.single('audiofile'), async (req, res) => {
     // link is the returned object URL from S3
     const link = await uploadAudio(filename, bucketname, file)
 
-    // Download the file from S3 bucket to a local directory
-  // const localFilePath = './transcription/tempFile.mp3'; // You can specify your desired local path
-  audiofornow = await downloadFile(link) // You can specify your desired local path
-  // await downloadFile(link, localFilePath);
-
-  // Now, read the file using fs.createReadStream()
-  const transcription = await openai.audio.transcriptions.create({
-    // file: fs.createReadStream(audiofornow),
-    file: Readable.from(fs.readFileSync(audiofornow)),
-    model: "whisper-1"
-  });
-    console.log(transcription)
+  
+  
+  
+ 
     const new_data= new AudioModel({
       name:originalname,
       audio:link,
-      transcription:transcription.text
+      
     })
     await new_data.save()
     res.send(link)
 })
 
 
-// const audioFun=async()=>{
-//   const transcription=await openai.audio.transcriptions.create({
-//       file:fs.createReadStream("aud.mp3"),
-//      model:"whisper-1"
-//   })
-//   console.log(transcription.text)
-// }
 
 
 const PORT=8080;
@@ -113,5 +71,6 @@ app.listen(PORT, async (req, res) => {
   console.log(`listening on ${PORT}`);
 });
 
+//-------------------------------------------------------------->
 
 

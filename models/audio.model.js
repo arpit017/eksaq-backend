@@ -5,7 +5,7 @@ const audioSchema=mongoose.Schema({
 
     name:String,
     audio:String,
-    transcription:String
+    
 
 })
 const AudioModel=mongoose.model("audio",audioSchema)
