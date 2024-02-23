@@ -2,6 +2,7 @@ const express = require("express");
 const { connection } = require("./connection");
 // const { S3 } = require('aws-sdk');
 // const s3 = new S3();
+const { Readable } = require('stream');
 require('dotenv').config()
 const https = require('https');
 const multer = require('multer');
