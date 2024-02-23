@@ -14,14 +14,14 @@ const cors=require("cors")
 const app = express();
 const OpenAI =require( "openai");
 const fs=require("fs")
+app.use(express.json());
+app.use(cors())
+app.use(express.urlencoded({ extended: false }))
 const openai= new OpenAI(
   {
 apiKey:process.env.API_KEY
 }
 ) 
-app.use(express.json());
-app.use(cors())
-app.use(express.urlencoded({ extended: false }))
 
 app.get("/", async(req, res) => {
  const data=await AudioModel.find();
