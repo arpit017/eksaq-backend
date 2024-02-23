@@ -22,26 +22,26 @@ const openai= new OpenAI(
 apiKey:process.env.API_KEY
 }
 ) 
-
+let audiofornow=""
 app.get("/", async(req, res) => {
  const data=await AudioModel.find();
  res.send({data})
 });
 
-const downloadFile = (url, dest) => {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest);
-    https.get(url, (response) => {
-      response.pipe(file);
-      file.on('finish', () => {
-        file.close(resolve(dest));
-      });
-    }).on('error', (err) => {
-      fs.unlink(dest);
-      reject(err.message);
-    });
-  });
-};
+// const downloadFile = (url, dest) => {
+//   return new Promise((resolve, reject) => {
+//     const file = fs.createWriteStream(dest);
+//     https.get(url, (response) => {
+//       response.pipe(file);
+//       file.on('finish', () => {
+//         file.close(resolve(dest));
+//       });
+//     }).on('error', (err) => {
+//       fs.unlink(dest);
+//       reject(err.message);
+//     });
+//   });
+// };
 
 
 app.post('/upload', upload.single('audiofile'), async (req, res) => {
@@ -55,12 +55,13 @@ app.post('/upload', upload.single('audiofile'), async (req, res) => {
     const link = await uploadAudio(filename, bucketname, file)
 
     // Download the file from S3 bucket to a local directory
-  const localFilePath = './transcription/tempFile.mp3'; // You can specify your desired local path
-  await downloadFile(link, localFilePath);
+  // const localFilePath = './transcription/tempFile.mp3'; // You can specify your desired local path
+  audiofornow = await downloadFile(link) // You can specify your desired local path
+  // await downloadFile(link, localFilePath);
 
   // Now, read the file using fs.createReadStream()
   const transcription = await openai.audio.transcriptions.create({
-    file: fs.createReadStream(localFilePath),
+    file: fs.createReadStream(audiofornow),
     model: "whisper-1"
   });
     console.log(transcription)
